@@ -217,6 +217,8 @@ add_python_test(PY_TEST_NAMES ${PREFIX} 1 "12-prop-response-topic-correlation-da
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "12-prop-response-topic.py")
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "12-prop-server-keepalive.py")
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "13-websocket-bad-origin.py")
+add_python_test(PY_TEST_NAMES ${PREFIX} 1 "13-websocket-empty-frame.py")
+add_python_test(PY_TEST_NAMES ${PREFIX} 1 "13-websocket-fragmented-frame.py")
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "14-dynsec-acl.py")
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "14-dynsec-allow-wildcard.py")
 add_python_test(PY_TEST_NAMES ${PREFIX} 1 "14-dynsec-anon-group.py")

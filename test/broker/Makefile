@@ -243,6 +243,8 @@ endif
 13 :
 ifneq ($(WITH_WEBSOCKETS),no)
 	./13-websocket-bad-origin.py
+	./13-websocket-empty-frame.py
+	./13-websocket-fragmented-frame.py
 endif
 
 14 :

@@ -13,7 +13,7 @@ target_include_directories(temperature_conversion_test PRIVATE
 )
 target_link_libraries(temperature_conversion_test PRIVATE
 	GTest::gmock_main
-	cJSON
+	cjson
 	libmosquitto_common
 )
 gtest_discover_tests(temperature_conversion_test)
