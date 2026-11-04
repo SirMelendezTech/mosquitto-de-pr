@@ -173,7 +173,7 @@ static ssize_t read_ws_payloadlen_short(struct mosquitto *mosq)
 	}
 
 	mosq->wsd.mask = (hbuf & 0x80) >> 7;
-	if(mosq->wsd.mask == 0){
+	if(mosq->wsd.mask == 0 && !mosq->wsd.is_client){
 		/* RFC 6455 5.1: a server MUST close the connection on receipt of a frame
 		 * that is not masked. */
 		mosq->wsd.disconnect_reason = 0xEA;
