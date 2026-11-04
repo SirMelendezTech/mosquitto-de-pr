@@ -62,13 +62,14 @@ tests = [
     (1, './03-publish-qos1-max-inflight.py'),
     (1, './03-publish-qos1-no-subscribers-v5.py'),
     (1, './03-publish-qos1-retain-disabled.py'),
-    #(1, './03-publish-qos2-max-inflight-exceeded.py'),
+    (1, './03-publish-qos2-max-inflight-exceeded.py'),
     (1, './03-publish-qos2-max-inflight.py'),
     (1, './03-publish-qos2-reuse-mid.py'),
 
     (1, './04-retain-check-source-persist.py'),
     (1, './04-retain-check-source.py'),
     (1, './04-retain-clear-multiple.py'),
+    (1, './04-retain-qos0-busy.py'),
     (1, './04-retain-qos0-repeated.py'),
     (1, './04-retain-upgrade-outgoing-qos.py'),
     (2, './04-retain-check-source-persist-diff-port.py'),
@@ -85,6 +86,7 @@ tests = [
     (2, './06-bridge-br2b-disconnect-qos1.py'),
     (2, './06-bridge-br2b-disconnect-qos2.py'),
     (2, './06-bridge-br2b-remapping.py'),
+    (2, './06-bridge-clean-session-inflight-quota.py'),
     (2, './06-bridge-clean-session-csF-lcsF.py'),
     (2, './06-bridge-clean-session-csF-lcsN.py'),
     (2, './06-bridge-clean-session-csF-lcsT.py'),
@@ -99,6 +101,7 @@ tests = [
     (2, './06-bridge-fail-persist-resend-qos1.py'),
     (2, './06-bridge-fail-persist-resend-qos2.py'),
     (1, './06-bridge-no-local.py'),
+    (2, './06-bridge-notification-quota.py'),
     (2, './06-bridge-outgoing-retain.py'),
     (2, './06-bridge-per-listener-settings.py'),
     (2, './06-bridge-reconnect-local-out.py'),
@@ -206,6 +209,8 @@ tests = [
     (1, './12-prop-server-keepalive.py'),
 
     (1, './13-websocket-bad-origin.py'),
+    (1, './13-websocket-empty-frame.py'),
+    (1, './13-websocket-fragmented-frame.py'),
 
     (1, './14-dynsec-acl.py'),
     (1, './14-dynsec-allow-wildcard.py'),
@@ -226,6 +231,7 @@ tests = [
     (1, './14-dynsec-plugin-invalid.py'),
     (1, './14-dynsec-role-invalid.py'),
     (1, './14-dynsec-role.py'),
+    (1, './14-dynsec-shared-sub.py'),
 
     (2, './15-persist-bridge-queue.py',  'persist_sqlite'),
     (2, './15-persist-client-msg-in-v3-1-1.py', 'persist_sqlite'),

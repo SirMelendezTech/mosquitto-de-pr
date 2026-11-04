@@ -274,9 +274,6 @@ static int mosquitto__reconnect(struct mosquitto *mosq, bool blocking)
 	{
 		rc = net__socket_connect(mosq, mosq->host, mosq->port, mosq->bind_address, blocking);
 	}
-	char address[1024];
-	uint16_t port;
-	get_address(mosq->sock, address, 1024, &port);
 	if(rc>0){
 		mosquitto__set_state(mosq, mosq_cs_connect_pending);
 		return rc;
@@ -292,7 +289,11 @@ static int mosquitto__reconnect(struct mosquitto *mosq, bool blocking)
 		mosquitto__set_state(mosq, mosq_cs_connected);
 #if defined(WITH_WEBSOCKETS) && WITH_WEBSOCKETS == WS_IS_BUILTIN
 		if(mosq->transport == mosq_t_ws){
-			http_c__context_init(mosq);
+			rc = http_c__context_init(mosq);
+			if(rc){
+				packet__cleanup_all(mosq);
+				net__socket_close(mosq);
+			}
 		}else
 #endif
 		{

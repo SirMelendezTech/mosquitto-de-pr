@@ -173,6 +173,13 @@ static ssize_t read_ws_payloadlen_short(struct mosquitto *mosq)
 	}
 
 	mosq->wsd.mask = (hbuf & 0x80) >> 7;
+	if(mosq->wsd.mask == 0 && !mosq->wsd.is_client){
+		/* RFC 6455 5.1: a server MUST close the connection on receipt of a frame
+		 * that is not masked. */
+		mosq->wsd.disconnect_reason = 0xEA;
+		errno = EPROTO;
+		return -1;
+	}
 	plen = hbuf & 0x7F;
 
 	if(plen == 126){
@@ -230,7 +237,17 @@ ssize_t net__read_ws(struct mosquitto *mosq, void *buf, size_t count)
 {
 	ssize_t len = 0;
 
-	if(mosq->wsd.payloadlen == 0){
+	/* Parse the frame header. Each field (opcode, initial length byte,
+	 * extended length bytes, masking key) may arrive across multiple reads,
+	 * so we must be able to resume at the correct field on re-entry. The
+	 * header is only complete once all of them have been fully read.
+	 *
+	 * This must NOT be gated on `payloadlen == 0`: a payload length may
+	 * legitimately be zero, or may only have been partially read with its
+	 * already-received high-order bytes still zero. Gating on payloadlen
+	 * caused the remaining length bytes and/or the masking key to be skipped
+	 * when they were fragmented across reads, desynchronising the stream. */
+	if(!mosq->wsd.hdr_complete){
 		if(mosq->wsd.opcode == UINT8_MAX){
 			len = read_ws_opcode(mosq);
 			if(len <= 0){
@@ -250,6 +267,12 @@ ssize_t net__read_ws(struct mosquitto *mosq, void *buf, size_t count)
 			if(len <= 0){
 				return len;
 			}
+			if(mosq->wsd.payloadlen_bytes > 0){
+				/* Extended length only partially read - wait for the
+				 * remaining bytes before reading the masking key. */
+				errno = EAGAIN;
+				return -1;
+			}
 		}
 
 		if(mosq->wsd.mask == 1 && mosq->wsd.mask_bytes > 0){
@@ -258,6 +281,8 @@ ssize_t net__read_ws(struct mosquitto *mosq, void *buf, size_t count)
 				return len;
 			}
 		}
+
+		mosq->wsd.hdr_complete = true;
 
 		if(mosq->wsd.opcode == WS_CLOSE && mosq->wsd.payloadlen == 1){
 			mosq->wsd.disconnect_reason = 0xEA;
@@ -332,10 +357,20 @@ ssize_t net__read_ws(struct mosquitto *mosq, void *buf, size_t count)
 			* packet__queue. */
 			len = -1;
 			errno = EAGAIN;
+		}else if(mosq->wsd.payloadlen == 0){
+			/* A data frame with no payload. This is valid - a frame carries a
+			* piece of the MQTT byte stream and is allowed to carry none of it -
+			* but no application data has been produced. Without this, `len`
+			* still holds the size of the last header field read, and returning
+			* it tells the caller that many bytes of MQTT data are waiting in a
+			* buffer nothing was written to. */
+			len = -1;
+			errno = EAGAIN;
 		}
 		mosq->wsd.payloadlen = 0;
 		mosq->wsd.opcode = UINT8_MAX;
 		mosq->wsd.mask = UINT8_MAX;
+		mosq->wsd.hdr_complete = false;
 	}else if(mosq->wsd.out_packet){
 		/* Testing or PING - so we haven't read any data for the application yet.
 		* Simulate that situation.*/

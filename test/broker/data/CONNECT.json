@@ -199,7 +199,8 @@
 				{"type":"recv", "payload":"20 r14 00000B 22 H10 27 L2000000 21 H20", "comment": "CONNACK"}
 			]},
 			{ "name": "10 Will flag 1 Will Qos 3 [MQTT-3.1.2-14]", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 1E k10 v0 s1 'p' v0 s1 'p' s1 'p'"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 1E k10 v0 s1 'p' v0 s1 'p' s1 'p'"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Client ID with 0x0000", "msgs": [
 				{"type":"send", "payload":"10 r18 s4 'MQTT' 05 02 k10 v0 s5 746F700000"},
@@ -234,28 +235,36 @@
 				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 [MQTT-3.1.2-17]", "msgs":[
-				{"type":"send", "payload":"10 r14 s4 'MQTT' 05 82 k10 v0 s1 'p'"}
+				{"type":"send", "payload":"10 r14 s4 'MQTT' 05 82 k10 v0 s1 'p'"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0x0000", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F700000"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F700000"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0xD800", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FEDA080"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FEDA080"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0x0001", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F700170"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F700170"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0x001F", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F701F70"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F701F70"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0x007F", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F707F70"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746F707F70"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0x009F", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FC29F70"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FC29F70"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 Username with 0xFFFF", "msgs":[
-				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FEDBFBF"}
+				{"type":"send", "payload":"10 r21 s4 'MQTT' 05 82 k10 v0 s1 'p' s5 746FEDBFBF"},
+				{"type":"recv", "payload":"20 r3 00 81 00"}
 			]},
 			{ "name": "10 [MQTT-3.1.2-18]", "msgs":[
 				{"type":"send", "payload":"10 r20 s4 'MQTT' 05 82 k10 v0 s1 'p' s1 'p' s1 'p'"},

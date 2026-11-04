@@ -585,7 +585,10 @@ static int read_and_verify_connect_flags(struct mosquitto *context, uint8_t *con
 		if((*connect_flags & 0x01) != 0x00){
 			log__printf(NULL, MOSQ_LOG_INFO, "Protocol error from %s:%d: CONNECT with non-zero connect reserved flag (%02X).",
 					context->address, context->remote_port, *connect_flags);
-			return MOSQ_ERR_PROTOCOL;
+			if(context->protocol == mosq_p_mqtt5){
+				send__connack(context, 0, MQTT_RC_MALFORMED_PACKET, NULL);
+			}
+			return MOSQ_ERR_MALFORMED_PACKET;
 		}
 	}
 
@@ -651,7 +654,10 @@ static int verify_will_options(struct mosquitto *context, uint8_t will, uint8_t 
 	if(will_qos == 3){
 		log__printf(NULL, MOSQ_LOG_INFO, "Protocol error from %s:%d: CONNECT with invalid Will QoS (%d).",
 				context->address, context->remote_port, will_qos);
-		return MOSQ_ERR_PROTOCOL;
+		if(protocol_version == mosq_p_mqtt5){
+			send__connack(context, 0, MQTT_RC_MALFORMED_PACKET, NULL);
+		}
+		return MOSQ_ERR_MALFORMED_PACKET;
 	}
 
 	if(will && will_retain && db.config->retain_available == false){
@@ -809,6 +815,9 @@ static int read_and_verify_client_credentials_from_packet(struct mosquitto *cont
 	if(username_flag){
 		rc = set_username_from_packet(context, username, clientid);
 		if(rc != MOSQ_ERR_SUCCESS){
+			if(context->protocol == mosq_p_mqtt5){
+				send__connack(context, 0, MQTT_RC_MALFORMED_PACKET, NULL);
+			}
 			return rc;
 		}
 	}else{
@@ -1163,7 +1172,10 @@ int handle__connect(struct mosquitto *context)
 			if(will_qos != 0 || will_retain != 0){
 				log__printf(NULL, MOSQ_LOG_INFO, "Protocol error from %s: CONNECT without Will with non-zero QoS (%d) or retain (%d).",
 						clientid, will_qos, will_retain);
-				rc = MOSQ_ERR_PROTOCOL;
+				if(context->protocol == mosq_p_mqtt5){
+					send__connack(context, 0, MQTT_RC_MALFORMED_PACKET, NULL);
+				}
+				rc = MOSQ_ERR_MALFORMED_PACKET;
 				goto handle_connect_error;
 			}
 		}
@@ -1242,7 +1254,8 @@ int handle__connect(struct mosquitto *context)
 		}
 	}else{
 #ifdef WITH_TLS
-		if(context->listener->ssl_ctx && (context->listener->use_identity_as_username || context->listener->use_subject_as_username)){
+		if((context->listener->ssl_ctx || context->listener->enable_proxy_protocol > 0)
+				&& (context->listener->use_identity_as_username || context->listener->use_subject_as_username)){
 			/* Authentication assumed to be cleared */
 		}else
 #endif

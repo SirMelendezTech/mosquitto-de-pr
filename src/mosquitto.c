@@ -210,7 +210,7 @@ static int drop_privileges(struct mosquitto__config *config)
 					}
 				}
 			}
-			if(initgroups(config->user, pwd->pw_gid) == -1){
+			if(initgroups(config->user, (int)pwd->pw_gid) == -1){
 				err = strerror(errno);
 				log__printf(NULL, MOSQ_LOG_ERR, "Error setting groups whilst dropping privileges: %s.", err);
 				return MOSQ_ERR_ERRNO;
@@ -353,7 +353,9 @@ static void post_shutdown_cleanup(void)
 	broker_control__cleanup();
 
 #ifdef WITH_PERSISTENCE
-	persist__backup(true);
+	if(db.config && !db.config->test_configuration){
+		persist__backup(true);
+	}
 #endif
 	session_expiry__remove_all();
 

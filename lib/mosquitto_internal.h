@@ -277,6 +277,7 @@ struct ws_data {
 	uint8_t mask_bytes;
 	uint8_t payloadlen_bytes;
 	bool is_client;
+	bool hdr_complete;
 };
 #endif
 
@@ -463,6 +464,7 @@ struct mosquitto {
 	struct mosquitto *for_free_next;
 	struct session_expiry_list *expiry_list_item;
 	uint16_t remote_port;
+	bool connect_event_received; /* the event loop reported the pending connect as complete */
 #  ifndef WITH_OLD_KEEPALIVE
 	struct mosquitto *keepalive_next;
 	struct mosquitto *keepalive_prev;

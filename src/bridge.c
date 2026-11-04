@@ -269,6 +269,7 @@ static int bridge__connect_step1(struct mosquitto *context)
 	context->clean_start = context->bridge->clean_start;
 	context->in_packet.payload = NULL;
 	context->ping_t = 0;
+	context->is_dropping = false;
 	context->bridge->lazy_reconnect = false;
 	context->maximum_packet_size = context->bridge->maximum_packet_size;
 	bridge__packet_cleanup(context);
@@ -389,6 +390,7 @@ static int bridge__connect_step2(struct mosquitto *context)
 	HASH_ADD(hh_sock, db.contexts_by_sock, sock, sizeof(context->sock), context);
 
 	if(rc == MOSQ_ERR_CONN_PENDING){
+		context->connect_event_received = false;
 		mosquitto__set_state(context, mosq_cs_connect_pending);
 		mux__add_out(context);
 	}
@@ -507,6 +509,7 @@ int bridge__connect(struct mosquitto *context)
 	context->clean_start = context->bridge->clean_start;
 	context->in_packet.payload = NULL;
 	context->ping_t = 0;
+	context->is_dropping = false;
 	context->bridge->lazy_reconnect = false;
 	context->maximum_packet_size = context->bridge->maximum_packet_size;
 	bridge__packet_cleanup(context);
@@ -601,6 +604,7 @@ int bridge__connect(struct mosquitto *context)
 
 		return rc;
 	}else if(rc == MOSQ_ERR_CONN_PENDING){
+		context->connect_event_received = false;
 		mosquitto__set_state(context, mosq_cs_connect_pending);
 		mux__add_out(context);
 	}
@@ -982,7 +986,7 @@ static void bridge_check_pending(struct mosquitto *context)
 	if(context->state == mosq_cs_connect_pending){
 		len = sizeof(int);
 		if(!getsockopt(context->sock, SOL_SOCKET, SO_ERROR, (char *)&err, &len)){
-			if(err == 0){
+			if(err == 0 && context->connect_event_received){ /* on Windows SO_ERROR is also 0 while the connect is still in progress */
 				mosquitto__set_state(context, mosq_cs_new);
 #if defined(WITH_ADNS) && defined(WITH_BRIDGE)
 				if(context->bridge){

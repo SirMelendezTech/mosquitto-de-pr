@@ -81,7 +81,7 @@ msg_sequence_test:
 	./03-publish-qos1-max-inflight-expire.py
 	./03-publish-qos1-no-subscribers-v5.py
 	./03-publish-qos1-retain-disabled.py
-	#./03-publish-qos2-max-inflight-exceeded.py
+	./03-publish-qos2-max-inflight-exceeded.py
 	./03-publish-qos2-max-inflight.py
 	./03-publish-qos2-reuse-mid.py
 
@@ -90,6 +90,7 @@ msg_sequence_test:
 	./04-retain-check-source-persist.py
 	./04-retain-check-source.py
 	./04-retain-clear-multiple.py
+	./04-retain-qos0-busy.py
 	./04-retain-qos0-repeated.py
 	./04-retain-upgrade-outgoing-qos.py
 
@@ -107,6 +108,7 @@ msg_sequence_test:
 	./06-bridge-br2b-disconnect-qos1.py
 	./06-bridge-br2b-disconnect-qos2.py
 	./06-bridge-br2b-remapping.py
+	./06-bridge-clean-session-inflight-quota.py
 	./06-bridge-clean-session-csF-lcsF.py
 	./06-bridge-clean-session-csF-lcsN.py
 	./06-bridge-clean-session-csF-lcsT.py
@@ -121,6 +123,7 @@ msg_sequence_test:
 	./06-bridge-fail-persist-resend-qos1.py
 	./06-bridge-fail-persist-resend-qos2.py
 	./06-bridge-no-local.py
+	./06-bridge-notification-quota.py
 	./06-bridge-outgoing-retain.py
 	./06-bridge-per-listener-settings.py
 	./06-bridge-reconnect-local-out.py
@@ -240,6 +243,8 @@ endif
 13 :
 ifneq ($(WITH_WEBSOCKETS),no)
 	./13-websocket-bad-origin.py
+	./13-websocket-empty-frame.py
+	./13-websocket-fragmented-frame.py
 endif
 
 14 :
@@ -263,6 +268,7 @@ ifeq ($(WITH_TLS),yes)
 	./14-dynsec-plugin-invalid.py
 	./14-dynsec-role-invalid.py
 	./14-dynsec-role.py
+	./14-dynsec-shared-sub.py
 endif
 
 PERSIST_TESTS = \
@@ -332,6 +338,7 @@ endif
 	./21-proxy-v2-bad-header.py
 	./21-proxy-v2-local.py
 	./21-proxy-v2-ipv4.py
+	./21-proxy-v2-ipv4-split.py
 	./21-proxy-v2-ipv6.py
 	./21-proxy-v2-unix.py
 ifneq ($(WITH_WEBSOCKETS),no)

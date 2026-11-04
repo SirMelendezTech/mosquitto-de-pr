@@ -437,6 +437,12 @@ int db__message_delete_outgoing(struct mosquitto *context, uint16_t mid, enum mo
 				return MOSQ_ERR_PROTOCOL;
 			}
 			db__message_remove_inflight(context, &context->msgs_out, client_msg);
+			/* Only release send quota for messages we were tracking, otherwise
+			 * acks for untracked messages, such as the bridge notification,
+			 * would allow us to exceed the remote receive-maximum. */
+			if(qos > 0){
+				util__increment_send_quota(context);
+			}
 			deleted = true;
 			break;
 		}
@@ -809,6 +815,7 @@ int db__messages_delete_incoming(struct mosquitto *context)
 	context->msgs_in.queued_bytes12 = 0;
 	context->msgs_in.queued_count = 0;
 	context->msgs_in.queued_count12 = 0;
+	context->msgs_in.inflight_quota = context->msgs_in.inflight_maximum;
 
 	return MOSQ_ERR_SUCCESS;
 }
@@ -830,6 +837,7 @@ int db__messages_delete_outgoing(struct mosquitto *context)
 	context->msgs_out.queued_bytes12 = 0;
 	context->msgs_out.queued_count = 0;
 	context->msgs_out.queued_count12 = 0;
+	context->msgs_out.inflight_quota = context->msgs_out.inflight_maximum; /* quota taken by db__message_reconnect_reset() for the deleted messages */
 
 	return MOSQ_ERR_SUCCESS;
 }
